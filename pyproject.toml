@@ -1,0 +1,16 @@
+[project]
+name = "SM-Backup-DR"
+version = "2.0.0"
+description = "备份与灾备中心：备份任务、快照、恢复演练与保留策略"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 200
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
