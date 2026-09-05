@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from app import base
 
 SERVICE = "sm-backup-dr"
-VERSION = "2.0.0"
+VERSION = "3.0.0"
 NAME = "SM Backup DR"
 DESCRIPTION = "备份与灾备中心：备份任务、快照、恢复演练与保留策略"
 PORT = 8430
