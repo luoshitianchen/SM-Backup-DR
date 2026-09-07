@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sm-backup-dr
+  namespace: sm
+  labels:
+    app: sm-backup-dr
+    platform: sm-suite
+spec:
+  type: ClusterIP
+  selector:
+    app: sm-backup-dr
+  ports:
+  - name: http
+    port: 8430
+    targetPort: http
+    protocol: TCP
