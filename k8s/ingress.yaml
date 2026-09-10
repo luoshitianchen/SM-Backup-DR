@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sm-backup-dr
+  namespace: sm-platform
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "1m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - sm-backup-dr.sm-platform.example.com
+      secretName: sm-backup-dr-tls
+  rules:
+    - host: sm-backup-dr.sm-platform.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sm-backup-dr
+                port:
+                  number: 8300
