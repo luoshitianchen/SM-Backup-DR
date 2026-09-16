@@ -1,0 +1,46 @@
+groups:
+- name: sm-backup-dr-alerts
+  rules:
+  - alert: SMBackupDRServiceDown
+    expr: up{job="sm-backup-dr"} == 0
+    for: 1m
+    labels:
+      severity: Critical
+      service: sm-backup-dr
+    annotations:
+      summary: '{{ $labels.instance }} SM Backup DR 服务不可用'
+      description: SM Backup DR（sm-backup-dr）的 up 指标已连续 1 分钟为 0，目标实例可能已宕机或无法被 Prometheus
+        抓取。
+  - alert: SMBackupDRHighErrorRate
+    expr: sum(rate(sm_backup_dr_http_requests_total{status=~"5.."}[5m])) / sum(rate(sm_backup_dr_http_requests_total[5m]))
+      > 0.05
+    for: 5m
+    labels:
+      severity: Warning
+      service: sm-backup-dr
+    annotations:
+      summary: SM Backup DR 5xx 错误率超过 5%
+      description: SM Backup DR（sm-backup-dr）过去 5 分钟 5xx 响应占比 超过 5%（当前值 {{ $value
+        | humanizePercentage }}），请检查上游依赖与错误日志。
+  - alert: SMBackupDRHighLatency
+    expr: (sum(rate(sm_backup_dr_latency_ms_total[5m])) / sum(rate(sm_backup_dr_requests_total[5m])))
+      > 1000
+    for: 5m
+    labels:
+      severity: Warning
+      service: sm-backup-dr
+    annotations:
+      summary: SM Backup DR 请求平均延迟超过 1s
+      description: SM Backup DR（sm-backup-dr）过去 5 分钟请求平均延迟 （rate(latency_ms_total)/rate(requests_total)）超过
+        1000ms（当前 {{ $value | humanize }} ms）。注：该服务未暴露延迟直方图，此处用平均延迟近似 p99 高延迟告警。
+  - alert: SMBackupDRHighMemoryUsage
+    expr: sum(container_memory_working_set_bytes{pod=~"sm-backup-dr-.*", container!="",
+      container!="POD"}) by (pod) > 536870912
+    for: 5m
+    labels:
+      severity: Warning
+      service: sm-backup-dr
+    annotations:
+      summary: SM Backup DR 进程内存超过 512MB
+      description: '{{ $labels.pod }} 容器工作集内存超过 512MiB（当前 {{ $value | humanize1024
+        }B），SM Backup DR（sm-backup-dr）存在内存泄漏或 OOM 风险，请排查。'
